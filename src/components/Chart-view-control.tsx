@@ -4,11 +4,11 @@ import { useState, useEffect } from "react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { appConfig } from "@/lib/config";
 import type { Session } from "@/lib/config";
 import { MapPin, Clock, Database } from "lucide-react";
 
 export interface ChartViewControlProps {
+  locations: string[];
   selectedLocation: string;
   selectedSession: Session;
   dataLimit: number | "all" | "custom";
@@ -20,6 +20,7 @@ export interface ChartViewControlProps {
 }
 
 export function ChartViewControl({
+  locations,
   selectedLocation,
   selectedSession,
   dataLimit,
@@ -57,7 +58,7 @@ export function ChartViewControl({
     }
   };
 
-  const locations = appConfig.locations.length > 0 ? appConfig.locations : ["No locations configured"];
+  const displayLocations = locations.length > 0 ? locations : ["No locations configured"];
 
   return (
     <div className="flex flex-wrap items-end gap-4 p-4 bg-muted/30 rounded-lg border">
@@ -72,7 +73,7 @@ export function ChartViewControl({
             <SelectValue placeholder="Pilih lokasi" />
           </SelectTrigger>
           <SelectContent>
-            {locations.map((location) => (
+            {displayLocations.map((location) => (
               <SelectItem key={location} value={location}>
                 <span className="capitalize">{location}</span>
               </SelectItem>

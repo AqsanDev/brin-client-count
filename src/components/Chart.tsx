@@ -21,7 +21,7 @@ import {
 } from "@/components/ui/chart";
 import { ChartViewControl } from "@/components/Chart-view-control";
 import { Button } from "@/components/ui/button";
-import { appConfig, DEFAULT_SESSION, type Session } from "@/lib/config";
+import { DEFAULT_SESSION, type Session } from "@/lib/config";
 
 interface RawClientCountItem {
   id?: string;
@@ -55,6 +55,7 @@ interface ApiClientCountResponse {
 }
 
 interface ChartProps {
+  locations: string[];
   initialLocation?: string;
   initialSession?: Session;
   initialDataLimit?: number | "all" | "custom";
@@ -62,13 +63,14 @@ interface ChartProps {
 }
 
 export function Chart({
+  locations,
   initialLocation,
   initialSession = DEFAULT_SESSION,
   initialDataLimit = 10,
   initialCustomLimit = 10,
-}: ChartProps = {}) {
+}: ChartProps) {
   const [selectedLocation, setSelectedLocation] = useState(
-    initialLocation || appConfig.locations[0] || ""
+    initialLocation || locations[0] || ""
   );
   const [selectedSession, setSelectedSession] = useState<Session>(initialSession);
   const [dataLimit, setDataLimit] = useState<number | "all" | "custom">(initialDataLimit);
@@ -244,6 +246,7 @@ export function Chart({
         <CardContent className="space-y-6">
           {/* Controls */}
           <ChartViewControl
+            locations={locations}
             selectedLocation={selectedLocation}
             selectedSession={selectedSession}
             dataLimit={dataLimit}

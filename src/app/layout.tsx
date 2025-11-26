@@ -13,7 +13,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: process.env.NEXT_PUBLIC_APP_NAME || "App dosen't have a name",
+  title: process.env.NEXT_PUBLIC_APP_NAME || "BRIN Client Count",
   description: "BRIN Client Count for monitoring how much clients are in the network",
 };
 

@@ -43,7 +43,7 @@ export async function fetchClientCounts<TPayload = unknown>({
   revalidateSeconds,
 }: FetchClientCountsOptions = {}): Promise<ClientCountResult<TPayload>[]> {
   if (!locations.length) {
-    throw new Error("No locations configured. Please set NEXT_PUBLIC_LOCATIONS in your environment variables.");
+    throw new Error("No locations configured. Please set LOCATIONS in your environment variables.");
   }
 
   const fetchOptions: NextFetchOptions = {
