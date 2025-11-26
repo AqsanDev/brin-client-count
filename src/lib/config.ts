@@ -8,7 +8,7 @@ const getRequiredEnv = (key: string) => {
   return value ?? "";
 };
 
-// Mendukung beberapa format untuk NEXT_PUBLIC_LOCATIONS:
+// Mendukung beberapa format untuk LOCATIONS:
 // - gatsu,thamrin,pejaten
 // - ["gatsu","thamrin","pejaten"]
 // - ['gatsu','thamrin','pejaten']
@@ -36,12 +36,12 @@ const parseLocations = (value: string) => {
 };
 
 const resolveBaseApiUrl = () => {
-  const envValue = getRequiredEnv("NEXT_PUBLIC_BASE_API_URL").trim();
+  const envValue = getRequiredEnv("BASE_API_URL").trim();
   if (envValue) return envValue;
 
   if (typeof window !== "undefined" && window.location.hostname) {
     console.warn(
-      "[config] NEXT_PUBLIC_BASE_API_URL tidak ditemukan. Menggunakan window.location.hostname sebagai fallback."
+      "[config] BASE_API_URL tidak ditemukan. Menggunakan window.location.hostname sebagai fallback."
     );
     return window.location.hostname;
   }
@@ -50,7 +50,7 @@ const resolveBaseApiUrl = () => {
 };
 
 const resolveBaseApiPort = () => {
-  const envValue = process.env.NEXT_PUBLIC_BASE_API_PORT?.trim();
+  const envValue = process.env.BASE_API_PORT?.trim();
   if (envValue) return envValue;
 
   if (typeof window !== "undefined" && window.location.port) {
@@ -62,7 +62,7 @@ const resolveBaseApiPort = () => {
 
 const baseApiUrl = resolveBaseApiUrl();
 const baseApiPort = resolveBaseApiPort();
-const locationsValue = process.env.NEXT_PUBLIC_LOCATIONS ?? "";
+const locationsValue = process.env.LOCATIONS ?? "";
 
 export const appConfig = {
   baseApiUrl,
