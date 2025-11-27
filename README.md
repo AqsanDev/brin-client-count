@@ -1,15 +1,24 @@
 # BRIN Client Count Dashboard
 
-A modern dashboard built with Next.js (App Router + TypeScript) for monitoring and visualizing client count data from the BRIN API. The application supports multiple locations and sessions (morning/afternoon) with real-time data visualization using interactive charts.
+A modern dashboard built with Next.js for monitoring and visualizing client count data from the BRIN API. Supports multiple locations and sessions with real-time data visualization.
 
-## Requirements
+## Features
 
-- **Node.js** 18 or higher
-- **npm**, **pnpm**, **yarn**, or **bun** package manager
+- 📊 Interactive charts with real-time data visualization
+- 🏢 Multi-location support
+- ⏰ Session management (morning/afternoon)
+- 🔄 Manual refresh capability
+- 🎨 Modern, responsive UI
+- 🐳 Docker support for easy deployment
+
+## Prerequisites
+
+- **Node.js** 18+ (for local development)
+- **Docker** (for containerized deployment)
 
 ## Environment Variables
 
-Create a `.env` file in the project root directory with the following variables:
+Create a `.env` file in the project root:
 
 ```env
 NEXT_PUBLIC_APP_NAME="Brin Client Count"
@@ -20,91 +29,208 @@ LOCATIONS=["gatsu", "thamrin", "ancol"]
 
 ### Variable Descriptions
 
-- **`BASE_API_URL`** - The hostname of the BRIN API server (without protocol)
-  - Example: `127.0.0.1` or `api.example.com`
-  
-- **`BASE_API_PORT`** - The port number for the API server
-  - Example: `1234` or `8080`
-  - Leave empty or omit if using default port (80)
+| Variable | Description | Example |
+|----------|-------------|---------|
+| `BASE_API_URL` | API server hostname (without protocol) | `127.0.0.1` or `api.example.com` |
+| `BASE_API_PORT` | API server port | `1234` or `8080` |
+| `LOCATIONS` | JSON array of location identifiers | `["gatsu", "thamrin", "ancol"]` |
 
-- **`LOCATIONS`** - Comma-separated list of location identifiers
-  - Supported formats:
-    - Simple: `gatsu,thamrin,pejaten`
-    - JSON array: `["gatsu","thamrin","pejaten"]`
-    - Single quotes: `['gatsu','thamrin','pejaten']`
+## Running Locally
 
-The application uses these variables to build API request URLs in the format:
+### Development Mode
+
+```bash
+# Install dependencies
+npm install
+
+# Create .env file
+cp .env.example .env
+
+# Start development server
+npm run dev
+```
+
+Open [http://localhost:3000](http://localhost:3000)
+
+### Production Build
+
+```bash
+npm run build
+npm start
+```
+
+## Running with Docker
+
+### 1. Build the Docker Image
+
+```bash
+docker build -t brin-client-count .
+```
+
+### 2. Run the Container
+
+**Option A: Using CLI flags**
+```bash
+docker run -d \
+  -p 3000:3000 \
+  -e BASE_API_URL="127.0.0.1" \
+  -e BASE_API_PORT="1234" \
+  -e LOCATIONS='["gatsu","ancol","pejaten"]' \
+  --name brin-client-count \
+  brin-client-count
+```
+
+**Option B: Using .env file (Recommended)**
+```bash
+# Create .env.production file with your variables
+docker run -d \
+  -p 3000:3000 \
+  --env-file .env.production \
+  --name brin-client-count \
+  brin-client-count
+```
+
+### 3. View Logs
+
+```bash
+docker logs brin-client-count
+```
+
+### 4. Stop/Remove Container
+
+```bash
+docker stop brin-client-count
+docker rm brin-client-count
+```
+
+## Docker Hub Deployment
+
+### Push to Docker Hub
+
+```bash
+# 1. Login to Docker Hub
+docker login
+
+# 2. Tag your image (replace 'your-username' with your Docker Hub username)
+docker tag brin-client-count your-username/brin-client-count:latest
+
+# 3. Push to Docker Hub
+docker push your-username/brin-client-count:latest
+```
+
+### Pull and Run on Server
+
+On your AlmaLinux server (or any Linux server):
+
+**Option A: Using .env file (Recommended)**
+
+```bash
+# 1. Login to Docker Hub (if image is private)
+docker login
+
+# 2. Pull the image
+docker pull your-username/brin-client-count:latest
+
+# 3. Create .env.production file
+cat > .env.production << EOF
+BASE_API_URL="127.0.0.1"
+BASE_API_PORT="1234"
+LOCATIONS=["gatsu", "ancol", "pejaten"]
+EOF
+
+# 4. Run the container
+docker run -d \
+  -p 3000:3000 \
+  --env-file .env.production \
+  --restart unless-stopped \
+  --name brin-client-count \
+  your-username/brin-client-count:latest
+
+# 5. Verify it's running
+docker ps
+docker logs brin-client-count
+```
+
+**Option B: Using CLI flags (No .env file)**
+
+```bash
+# 1. Login to Docker Hub (if image is private)
+docker login
+
+# 2. Pull the image
+docker pull your-username/brin-client-count:latest
+
+# 3. Run the container with explicit environment variables
+docker run -d \
+  -p 3000:3000 \
+  -e BASE_API_URL="127.0.0.1" \
+  -e BASE_API_PORT="1234" \
+  -e LOCATIONS='["gatsu","ancol","pejaten"]' \
+  --restart unless-stopped \
+  --name brin-client-count \
+  your-username/brin-client-count:latest
+
+# 4. Verify it's running
+docker ps
+docker logs brin-client-count
+```
+
+
+Access the application at `http://your-server-ip:3000`
+
+## Docker Flags Explained
+
+| Flag | Description |
+|------|-------------|
+| `-d` | Run container in background (detached mode) |
+| `-p 3000:3000` | Map port 3000 on host to port 3000 in container |
+| `-e VAR="value"` | Set environment variable |
+| `--env-file` | Load environment variables from file |
+| `--name` | Assign a name to the container |
+| `--restart unless-stopped` | Auto-restart container unless manually stopped |
+
+## Project Structure
+
+```
+├── src/
+│   ├── app/              # Next.js App Router pages and API routes
+│   ├── components/       # React components
+│   └── lib/              # Utilities and configuration
+├── public/               # Static assets
+├── Dockerfile            # Docker configuration
+├── .dockerignore         # Docker ignore file
+└── .env.example          # Environment variables template
+```
+
+## API Endpoint Format
+
+The application constructs API URLs in the following format:
+
 ```
 http://{BASE_API_URL}:{BASE_API_PORT}/client-count/{location}/{session}
 ```
 
-## Installation & Setup
+Example: `http://127.0.0.1:1234/client-count/gatsu/pagi`
 
-1. **Clone the repository** (if applicable) or navigate to the project directory
+## Troubleshooting
 
-2. **Install dependencies:**
-   ```bash
-   npm install
-   ```
+### Locations not showing up in Docker
 
-3. **Create environment file:**
-   ```bash
-   cp .env.example .env  # If you have an example file
-   # Or create .env manually and add the variables above
-   ```
+Make sure you've added `export const dynamic = "force-dynamic"` in `src/app/page.tsx` to ensure environment variables are read at runtime.
 
-4. **Configure environment variables:**
-   Edit the `.env` file and set the values according to your BRIN API configuration.
+### Port already in use
 
-## Running the Project
-
-### Development Mode
-
-Start the development server:
-
+Change the host port mapping:
 ```bash
-npm run dev
+docker run -p 8080:3000 ...  # Access via localhost:8080
 ```
 
-The application will be available at [http://localhost:3000](http://localhost:3000)
+### Container won't start
 
-### Production Build
-
-Build the application for production:
-
+Check logs:
 ```bash
-npm run build
+docker logs brin-client-count
 ```
-
-Start the production server:
-
-```bash
-npm start
-```
-
-## Features
-
-- 📊 **Interactive Charts** - Real-time visualization of client count data
-- 🏢 **Multi-Location Support** - Monitor multiple locations from a single dashboard
-- ⏰ **Session Management** - Switch between morning (pagi) and afternoon (siang) sessions
-- 🔄 **Auto-refresh** - Manual refresh capability for up-to-date data
-- 📈 **Data Trends** - View trends and statistics for each location
-- 🎨 **Modern UI** - Clean and responsive interface built with Tailwind CSS
-
-## Project Structure
-
-- `src/app/` - Next.js App Router pages and API routes
-- `src/components/` - React components (Chart, UI components)
-- `src/lib/` - Utility functions and configuration
-  - `config.ts` - Environment variable parsing and configuration
-  - `api/client-count.ts` - API client for fetching client count data
-
-## How It Works
-
-1. **Server-Side Rendering (SSR)** - The main page (`src/app/page.tsx`) reads location configuration from server-side environment variables
-2. **Data Fetching** - Client components fetch data through Next.js API routes
-3. **Real-time Updates** - Users can manually refresh data or change location/session filters
-4. **Error Handling** - Failed requests are displayed with clear error messages
 
 ## License
 
